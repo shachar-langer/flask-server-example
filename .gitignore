@@ -1,0 +1,5 @@
+# Ignore any .pyc files
+*.pyc
+
+# Ignore the SQLite database file
+app/server_db.db
