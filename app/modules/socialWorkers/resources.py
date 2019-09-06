@@ -82,7 +82,6 @@ class GetAllPatients(Resource):
         if social_worker is None:
             abort(404,
                   'Social Worker ID {} was not found'.format(social_worker_id))
-
         schema = PatientSchema()
         return schema.dump(social_worker.patients, many=True), 200
 

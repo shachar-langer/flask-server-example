@@ -3,3 +3,6 @@
 
 # Ignore the SQLite database file
 app/server_db.db
+
+# Ignore any log files
+*.log
