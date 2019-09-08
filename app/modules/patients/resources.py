@@ -7,28 +7,35 @@ from app.common import db
 from app.modules.patients.models import Patient
 from app.modules.patients.schemas import PatientSchema
 
-api = Namespace('patients', description="Patients")
+api = Namespace('patients',
+                description="Patients API")
 
 # TODO - make this model strict. Don't allow additional attributes
 patient_model = api.model('Patient', {
     'first_name': fields.String(required=True),
     'last_name': fields.String(required=True),
-})
+    })
 
 
-@api.route('/patients')
+@api.route('')
 class Patients(Resource):
     """
     REST API for patients
     """
 
-    def get(self):
+    def get(self):  # pylint: disable=no-self-use
+        """
+        Get all patients
+        """
         schema = PatientSchema()
         list_of_patients = Patient.query.all()
         return schema.dump(list_of_patients, many=True), 200
 
     @api.expect(patient_model, validate=True)
-    def post(self):
+    def post(self):  # pylint: disable=no-self-use
+        """
+        Create a new patient
+        """
         schema = PatientSchema()
         load_res = schema.load(api.payload)
         if load_res.errors:
@@ -41,7 +48,7 @@ class Patients(Resource):
         return schema.dump(new_patient).data, 201
 
 
-@api.route('/patients/<int:patient_id>')
+@api.route('/<int:patient_id>')
 class PatientById(Resource):
     """
     REST API for specific patient
@@ -56,11 +63,17 @@ class PatientById(Resource):
         return patient
 
     def get(self, patient_id):
+        """
+        Get a patient
+        """
         patient = self.getPatientObject(patient_id)
         schema = PatientSchema()
         return schema.dump(patient).data, 200
 
     def delete(self, patient_id):
+        """
+        Delete a patient
+        """
         patient = self.getPatientObject(patient_id)
         db.session.delete(patient)
         db.session.commit()

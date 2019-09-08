@@ -19,7 +19,10 @@ app = Flask(__name__)  # pylint: disable=invalid-name
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///server_db.db'
 app.config['SQLALCHEMY_ECHO'] = APP_DEBUG_MODE
 
-api = Api(app)  # pylint: disable=invalid-name
+api = Api(app,  # pylint: disable=invalid-name
+          version='1.0',
+          title='Flask Server Example API',
+          description='RESTful API for Flask Server Example')
 api.add_namespace(social_workers_api)
 api.add_namespace(patients_api)
 

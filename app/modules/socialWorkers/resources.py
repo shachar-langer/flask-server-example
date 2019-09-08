@@ -9,7 +9,8 @@ from app.modules.socialWorkers.schemas import SocialWorkerSchema
 from app.modules.patients.schemas import PatientSchema
 from app.common import db
 
-api = Namespace('socialWorkers', description="Social Workers")
+api = Namespace('socialWorkers',
+                description="Social Workers API")
 
 # TODO - make this model strict. Don't allow additional attributes
 social_worker_model = api.model('Social Worker', {
@@ -18,19 +19,25 @@ social_worker_model = api.model('Social Worker', {
     })
 
 
-@api.route('/socialWorkers')
+@api.route('')
 class SocialWorkers(Resource):
     """
     REST API for social workers
     """
 
-    def get(self):
+    def get(self):  # pylint: disable=no-self-use
+        """
+        Get all social workers
+        """
         schema = SocialWorkerSchema()
         list_of_social_workers = SocialWorker.query.all()
         return schema.dump(list_of_social_workers, many=True), 200
 
     @api.expect(social_worker_model, validate=True)
-    def post(self):
+    def post(self):  # pylint: disable=no-self-use
+        """
+        Create a new social worker
+        """
         schema = SocialWorkerSchema()
         load_res = schema.load(api.payload)
         if load_res.errors:
@@ -43,7 +50,7 @@ class SocialWorkers(Resource):
         return schema.dump(new_social_worker).data, 201
 
 
-@api.route('/socialWorkers/<int:social_worker_id>')
+@api.route('/<int:social_worker_id>')
 class SocialWorkerById(Resource):
     """
     REST API for specific social worker
@@ -58,24 +65,33 @@ class SocialWorkerById(Resource):
         return social_worker
 
     def get(self, social_worker_id):
+        """
+        Get a social worker
+        """
         social_worker = self.getSocialWorkerObject(social_worker_id)
         schema = SocialWorkerSchema()
         return schema.dump(social_worker).data, 200
 
     def delete(self, social_worker_id):
+        """
+        Delete a social worker
+        """
         social_worker = self.getSocialWorkerObject(social_worker_id)
         db.session.delete(social_worker)
         db.session.commit()
         return '', 204
 
 
-@api.route('/socialWorkers/<int:social_worker_id>/patients')
+@api.route('/<int:social_worker_id>/patients')
 class GetAllPatients(Resource):
     """
     REST API for patients of a spcific social worker
     """
 
-    def get(self, social_worker_id):
+    def get(self, social_worker_id):  # pylint: disable=no-self-use
+        """
+        Get all the patients of a social worker
+        """
         # Checking if the social worker ID exists
         social_worker = SocialWorker.query.filter_by(
             user_id=social_worker_id).first()
@@ -86,7 +102,7 @@ class GetAllPatients(Resource):
         return schema.dump(social_worker.patients, many=True), 200
 
 
-@api.route('/socialWorkers/<int:social_worker_id>/patients/<int:patient_id>')
+@api.route('/<int:social_worker_id>/patients/<int:patient_id>')
 class PatientsOfSocialWorkers(Resource):
     """
     REST API for specific patient of a specific social worker
@@ -113,11 +129,17 @@ class PatientsOfSocialWorkers(Resource):
         return patient
 
     def get(self, social_worker_id, patient_id):
+        """
+        Get a patient of a social workers
+        """
         patient = self.getPatientObject(social_worker_id, patient_id)
         schema = PatientSchema()
         return schema.dump(patient).data, 200
 
-    def put(self, social_worker_id, patient_id):
+    def put(self, social_worker_id, patient_id):  # pylint: disable=no-self-use
+        """
+        Add a patient to a social worker
+        """
         patient = Patient.query.filter_by(
             user_id=patient_id).first()
         if patient is None:
@@ -128,6 +150,9 @@ class PatientsOfSocialWorkers(Resource):
         return '', 204
 
     def delete(self, social_worker_id, patient_id):
+        """
+        Remove a patient from a social worker
+        """
         patient = self.getPatientObject(social_worker_id, patient_id)
         db.session.delete(patient)
         db.session.commit()
